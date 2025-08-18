@@ -1,9 +1,10 @@
 import { createBot, createFlow, createProvider } from "@builderbot/bot"
 
-import { BaileysProvider as Provider } from "@builderbot/provider-baileys";
+import { BaileysProvider } from "@builderbot/provider-baileys";
 import { welcomeFlow } from "../flow/welcome.flow";
 import { registerFlow } from "../flow/register.flow";
 import { fullSamplesFlow } from "../flow/fullsamples.flow";
+import { CustomQRProviderWithStatus } from "../provider";
 import { adapterDB } from "../database/json-database";
 
 const PORT = process.env.PORT ?? 3008
@@ -11,7 +12,7 @@ const PORT = process.env.PORT ?? 3008
 export const main = async () => {
     const adapterFlow = createFlow([welcomeFlow, registerFlow, fullSamplesFlow])
 
-    const adapterProvider = createProvider(Provider)
+    const adapterProvider = createProvider(CustomQRProviderWithStatus, {name: 'edi-bot'})
 
     const { handleCtx, httpServer } = await createBot({
         flow: adapterFlow,
