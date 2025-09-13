@@ -24,6 +24,9 @@ export const registerFlow = addKeyword<Provider, IDatabase>(utils.setEvent('REGI
     .addAnswer('¿Cedula del Cliente?', { capture: true }, async (ctx, { state }) => {
         await state.update({ cedula: ctx.body })
     })
+    .addAnswer('¿Ingrese el numero de teléfono?', { capture: true }, async (ctx, { state }) => {
+        await state.update({ phone: ctx.body })
+    })
     .addAnswer('¿Qué producto o servicio deseas incluir? (Ingresa el codigo del producto o servicio)', { capture: true }, async (ctx, { state }) => {
         await state.update({ products: ctx.body })
     })
@@ -39,7 +42,8 @@ export const registerFlow = addKeyword<Provider, IDatabase>(utils.setEvent('REGI
             'Desc',
             [
                 new Filter('NombreCliente', 'contains', state.get('name'), '', ''),
-                new Filter('Cedula', 'contains', state.get('cedula'), '', '')
+                new Filter('Cedula', 'contains', state.get('cedula'), '', ''),
+                new Filter('Telefono', 'contains', state.get('phone'), '', '')
             ],
             process.env.TOKEN || '',
             process.env.ENTIDAD || ''
@@ -56,7 +60,7 @@ export const registerFlow = addKeyword<Provider, IDatabase>(utils.setEvent('REGI
             'CodigoProducto',
             'DESC',
             [
-                new Filter('DescProducto', 'equals', state.get('products'), '', '')
+                new Filter('CodigoProducto', 'equals', state.get('products'), '', '')
             ],
             process.env.TOKEN || '',
             process.env.ENTIDAD || ''
@@ -71,7 +75,6 @@ export const registerFlow = addKeyword<Provider, IDatabase>(utils.setEvent('REGI
             const productoData = dataProduct[0];
 
             const date = new Date();
-
 
             const procesar = new Procesar(
                 process.env.ENTIDAD || '', // UsuarioCreado
@@ -115,7 +118,7 @@ export const registerFlow = addKeyword<Provider, IDatabase>(utils.setEvent('REGI
                         "codigo": productoData.CodigoProducto,
                         "linea": "",
                         "descripcion": productoData.Descripcion,
-                        "cantidadProducto": productoData.cantidadProducto,
+                        "cantidadProducto": productoData.cantidadProducto || 1,
                         "precio": state.get('mount'),
                         "descuento": 0,
                         "descuento01": 0,
@@ -128,15 +131,15 @@ export const registerFlow = addKeyword<Provider, IDatabase>(utils.setEvent('REGI
                         "descuento08": 0,
                         "descuento09": 0,
                         "descuento99": 0,
-                        "impuesto": productoData.Impuesto,
-                        "impuesto01": productoData.Impuesto01,
+                        "impuesto": productoData.Impuesto || 13,
+                        "impuesto01": productoData.Impuesto01 || 13,
                         "impuesto02": 0,
                         "impuesto03": 0,
                         "impuesto04": 0,
                         "impuesto05": 0,
                         "impuesto06": 0,
                         "impuesto99": 0,
-                        "impOrig": productoData.ImpOrig,
+                        "impOrig": productoData.ImpOrig || 13,
                         "exoneraLinea": 0,
                         "tipoExoneracionLinea": "",
                         "codigoInstitucionLinea": "",
@@ -151,7 +154,7 @@ export const registerFlow = addKeyword<Provider, IDatabase>(utils.setEvent('REGI
                         "totalLinea": state.get('mount'),
                         "cantidadBonificada": "",
                         "observacion": "",
-                        "cabys": productoData.Cabys
+                        "cabys": productoData.CodigoCabys
                     }]
                 }), // Linea
                 "{\"lineas\":[]}",
